@@ -17,7 +17,7 @@
     "description": {
       "defaultExecutablePath": "handler",
       "workingDirectory": "",
-      "arguments": []
+      "arguments": ["%FUNCTIONS_CUSTOMHANDLER_PORT%"]
     },
     "enableForwardingHttpRequest": true
   }
