@@ -81,12 +81,17 @@ fn default_response(query: &HashMap<String, String>) -> String {
         take = 10;
     }
 
+    let  filter_criteria = match query.get("firstname") {
+        Some(firstname_str) => firstname_str.to_string(),
+        None => "".to_owned(),
+    };
+
     let users = match populate_users(take) {
         Ok(usr) => usr,
         Err(_) => Vec::new(),
     };
 
-    filter(&mut users, criteria1...);
+    filter_users(&mut users, &filter_criteria);
 
     let json = match serde_json::to_string(&users) {
         Ok(val) => val,
@@ -94,4 +99,16 @@ fn default_response(query: &HashMap<String, String>) -> String {
     };
 
     json
+}
+
+fn filter_users(user: Vec<User>, filter_criteria: &string) -> Result<Vec<User>, csv::Error>  {
+    let filtered_rec: Vec<User> = user;
+
+   if filter_criteria != ""{
+    filtered_rec
+    .into_iter()
+    .filter(|fname| fname.first_name.starts_with(filter_criteria))
+    .collect();
+   }
+    Ok(filtered_rec)
 }
