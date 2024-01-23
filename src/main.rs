@@ -81,17 +81,17 @@ fn default_response(query: &HashMap<String, String>) -> String {
         take = 10;
     }
 
-    let json;
+    let users = match populate_users(take) {
+        Ok(usr) => usr,
+        Err(_) => users = Vec::new(),
+    };
 
-    match populate_users(take) {
-        Ok(users) => {
-            json = match serde_json::to_string(&users) {
-                Ok(val) => val,
-                Err(_) => panic!("JSON error"),
-            }
-        },
-        Err(_) => panic!("Fatal error"),
-    }
+    filter(&mut users, criteria1...);
+
+    let json = match serde_json::to_string(&users) {
+        Ok(val) => val,
+        Err(_) => panic!("JSON error"),
+    };
 
     json
 }
