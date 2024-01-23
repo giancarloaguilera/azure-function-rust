@@ -1,10 +1,12 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::env;
 use std::net::Ipv4Addr;
 use warp::{http::Response, Filter};
+use std::iter::Iterator;
 use serde::Serialize;
 
 #[derive(Serialize)]
+#[derive(Clone)]
 struct User {
     id: i64,
     first_name: String,
@@ -91,9 +93,12 @@ fn default_response(query: &HashMap<String, String>) -> String {
         Err(_) => Vec::new(),
     };
 
-    filter_users(&mut users, &filter_criteria);
+    let users1 = match filter_users( &users, &filter_criteria) {
+        Ok(usr) => usr,
+        Err(_) => Vec::new(),
+    };
 
-    let json = match serde_json::to_string(&users) {
+    let json = match serde_json::to_string(&users1) {
         Ok(val) => val,
         Err(_) => panic!("JSON error"),
     };
@@ -101,14 +106,17 @@ fn default_response(query: &HashMap<String, String>) -> String {
     json
 }
 
-fn filter_users(user: Vec<User>, filter_criteria: &string) -> Result<Vec<User>, csv::Error>  {
-    let filtered_rec: Vec<User> = user;
+fn filter_users(users: &Vec<User>, filter_criteria: &String) -> Result<Vec<User>, csv::Error>  {
 
-   if filter_criteria != ""{
-    filtered_rec
-    .into_iter()
-    .filter(|fname| fname.first_name.starts_with(filter_criteria))
-    .collect();
-   }
+    let mut filtered_rec = Vec::new();
+
+    for user in users {
+        if filter_criteria.len() == 0 || user.first_name.starts_with(filter_criteria) {
+            filtered_rec.push(user.clone());
+         }
+      
+    }
+
     Ok(filtered_rec)
 }
+
