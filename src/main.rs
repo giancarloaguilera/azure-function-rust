@@ -83,7 +83,7 @@ fn default_response(query: &HashMap<String, String>) -> String {
 
     let users = match populate_users(take) {
         Ok(usr) => usr,
-        Err(_) => users = Vec::new(),
+        Err(_) => Vec::new(),
     };
 
     filter(&mut users, criteria1...);
