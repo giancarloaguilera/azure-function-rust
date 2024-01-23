@@ -15,9 +15,9 @@
   },
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "handler",
+      "defaultExecutablePath": "handler.exe",
       "workingDirectory": "",
-      "arguments": ["%FUNCTIONS_CUSTOMHANDLER_PORT%"]
+      "arguments": []
     },
     "enableForwardingHttpRequest": true
   }

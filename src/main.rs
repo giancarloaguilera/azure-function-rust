@@ -22,21 +22,3 @@ async fn main() {
 
     warp::serve(example1).run((Ipv4Addr::LOCALHOST, port)).await
 }
-
-//Config tasks
-//Figure out how to set the FUNCTIONS_CUSTOMHANDLER_PORT environment variable for the function app.
-
-//Data tasks
-//Create CSV file with 10000 user records. See fields below. Mike and Savitha
-
-//Coding tasks
-//Create a user type with fields first name, last name, email, phone number, address, state, and zip code.
-//Create a function that loads the users JSON file, loops through each record, deserializes each one into a user object, and adds the user object to a list.
-//Add new query search parameters first name, last name, email, phone number, address, state, and zip code. 
-//For each query parameter filter the results based on the corresponding field.
-//For first name use contains logic. For last name use starts with. ???
-//Sort results by first name and last name.
-//Add paging support to the search.
-//Return the results in JSON format.
-
-//Find a API load tester/runner that can be configured to run N number of requests per second for N minutes. Dmitry
