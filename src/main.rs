@@ -1,8 +1,7 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::env;
 use std::net::Ipv4Addr;
 use warp::{http::Response, Filter};
-use std::iter::Iterator;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -41,16 +40,21 @@ async fn main() {
     warp::serve(host).run((Ipv4Addr::LOCALHOST, port)).await
 }
 
-fn populate_users(take: i32) -> Result<Vec<User>, csv::Error>  {
+// fn main() {
+//     let mut query = HashMap::new();
+
+//     query.insert(String::from("first_name"), String::from("M"));
+
+//     let json = default_response(&query);
+
+//     println!("{}", json);
+// }
+
+fn populate_users() -> Result<Vec<User>, csv::Error>  {
     let mut reader = csv::Reader::from_path("data/system_users.csv")?;
     let mut users = Vec::new();
 
-    let mut rec_num = 0;
-
     for record in reader.records() {
-        if rec_num >= take {
-            break;
-        }
 
         let record = record?;
 
@@ -67,7 +71,6 @@ fn populate_users(take: i32) -> Result<Vec<User>, csv::Error>  {
         };
 
         users.push(user);
-        rec_num += 1;
     }
 
     Ok(users)
@@ -81,24 +84,16 @@ fn default_response(query: &HashMap<String, String>) -> String {
 
     if take == 0 {
         take = 10;
-    }
+    }    
 
-    let  filter_criteria = match query.get("firstname") {
-        Some(firstname_str) => firstname_str.to_string(),
-        None => "".to_owned(),
-    };
-
-    let users = match populate_users(take) {
+    let users = match populate_users() {
         Ok(usr) => usr,
         Err(_) => Vec::new(),
     };
 
-    let users1 = match filter_users( &users, &filter_criteria) {
-        Ok(usr) => usr,
-        Err(_) => Vec::new(),
-    };
+    let filtered_users = filter_users(&users, query);
 
-    let json = match serde_json::to_string(&users1) {
+    let json = match serde_json::to_string(&filtered_users) {
         Ok(val) => val,
         Err(_) => panic!("JSON error"),
     };
@@ -106,17 +101,36 @@ fn default_response(query: &HashMap<String, String>) -> String {
     json
 }
 
-fn filter_users(users: &Vec<User>, filter_criteria: &String) -> Result<Vec<User>, csv::Error>  {
+fn filter_users<'a>(users: &'a Vec<User>, query: &HashMap<String, String>) -> Vec<&'a User>  {
 
     let mut filtered_rec = Vec::new();
+    
+    let empty_string = "";
+
+    let first_name = match query.get("firstname") {
+        Some(first_name) => first_name,
+        None => empty_string,
+    };
+
+    let last_name = match query.get("lastname") {
+        Some(last_name) => last_name,
+        None => empty_string,
+    };
+
+    let email = match query.get("email") {
+        Some(email) => email,
+        None => empty_string,
+    };
 
     for user in users {
-        if filter_criteria.len() == 0 || user.first_name.starts_with(filter_criteria) {
-            filtered_rec.push(user.clone());
-         }
-      
+        if (first_name.is_empty() || user.first_name.starts_with(first_name))
+            && (last_name.is_empty() || user.last_name.starts_with(last_name))
+            && (email.is_empty() || user.email.starts_with(email))
+        {
+            filtered_rec.push(user);
+        }
     }
 
-    Ok(filtered_rec)
+    filtered_rec
 }
 
