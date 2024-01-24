@@ -91,7 +91,12 @@ fn default_response(query: &HashMap<String, String>) -> String {
         Err(_) => Vec::new(),
     };
 
-    let filtered_users = filter_users(&users, query);
+    let mut filtered_users = filter_users(&users, query);
+
+    filtered_users.sort_by(|a, b| {
+        a.first_name.to_lowercase().cmp(&b.first_name.to_lowercase())
+            .then(a.last_name.cmp(&b.last_name))
+    });
 
     let json = match serde_json::to_string(&filtered_users) {
         Ok(val) => val,
@@ -103,29 +108,27 @@ fn default_response(query: &HashMap<String, String>) -> String {
 
 fn filter_users<'a>(users: &'a Vec<User>, query: &HashMap<String, String>) -> Vec<&'a User>  {
 
-    let mut filtered_rec = Vec::new();
-    
-    let empty_string = "";
+    let mut filtered_rec = Vec::new();    
 
     let first_name = match query.get("firstname") {
-        Some(first_name) => first_name,
-        None => empty_string,
+        Some(first_name) => first_name.to_lowercase(),
+        None => String::from(""),
     };
 
     let last_name = match query.get("lastname") {
-        Some(last_name) => last_name,
-        None => empty_string,
+        Some(last_name) => last_name.to_lowercase(),
+        None => String::from(""),
     };
 
     let email = match query.get("email") {
-        Some(email) => email,
-        None => empty_string,
+        Some(email) => email.to_ascii_lowercase(),
+        None => String::from(""),
     };
 
     for user in users {
-        if (first_name.is_empty() || user.first_name.starts_with(first_name))
-            && (last_name.is_empty() || user.last_name.starts_with(last_name))
-            && (email.is_empty() || user.email.starts_with(email))
+        if (first_name.is_empty() || user.first_name.to_lowercase().starts_with(&first_name))
+            && (last_name.is_empty() || user.last_name.to_lowercase().starts_with(&last_name))
+            && (email.is_empty() || user.email.to_lowercase().starts_with(&email))
         {
             filtered_rec.push(user);
         }
@@ -133,4 +136,5 @@ fn filter_users<'a>(users: &'a Vec<User>, query: &HashMap<String, String>) -> Ve
 
     filtered_rec
 }
+
 
