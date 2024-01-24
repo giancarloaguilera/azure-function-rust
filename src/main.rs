@@ -98,7 +98,13 @@ fn default_response(query: &HashMap<String, String>) -> String {
             .then(a.last_name.cmp(&b.last_name))
     });
 
-    let json = match serde_json::to_string(&filtered_users) {
+    let mut take_results: Vec<&User> = Vec::new();
+
+    while take_results.len() < take && take_results.len() < filtered_users.len() {
+        take_results.push(filtered_users[take_results.len()])        
+    }
+
+    let json = match serde_json::to_string(&take_results) {
         Ok(val) => val,
         Err(_) => panic!("JSON error"),
     };
