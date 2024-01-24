@@ -126,15 +126,9 @@ fn filter_users<'a>(users: &'a Vec<User>, query: &HashMap<String, String>) -> Ve
         None => String::from(""),
     };
 
-    let email = match query.get("email") {
-        Some(email) => email.to_ascii_lowercase(),
-        None => String::from(""),
-    };
-
     for user in users {
         if (first_name.is_empty() || user.first_name.to_lowercase().starts_with(&first_name))
-            && (last_name.is_empty() || user.last_name.to_lowercase().starts_with(&last_name))
-            && (email.is_empty() || user.email.to_lowercase().starts_with(&email))
+            && (last_name.is_empty() || user.last_name.to_lowercase().starts_with(&last_name))            
         {
             filtered_rec.push(user);
         }
