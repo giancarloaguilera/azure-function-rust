@@ -91,17 +91,17 @@ fn default_response(query: &HashMap<String, String>) -> String {
         Err(_) => Vec::new(),
     };
 
-    let mut filtered_users = filter_users(&users, query);
+    let mut filtered_users = filter_users(users, query);
 
     filtered_users.sort_by(|a, b| {
         a.first_name.to_lowercase().cmp(&b.first_name.to_lowercase())
             .then(a.last_name.cmp(&b.last_name))
     });
 
-    let mut take_results: Vec<&User> = Vec::new();
+    let mut take_results: Vec<User> = Vec::new();
 
-    while take_results.len() < take && take_results.len() < filtered_users.len() {
-        take_results.push(filtered_users[take_results.len()])        
+    while take_results.len() < take && filtered_users.len() > 0 {
+        take_results.push(filtered_users.remove(0));        
     }
 
     let json = match serde_json::to_string(&take_results) {
@@ -112,7 +112,7 @@ fn default_response(query: &HashMap<String, String>) -> String {
     json
 }
 
-fn filter_users<'a>(users: &'a Vec<User>, query: &HashMap<String, String>) -> Vec<&'a User>  {
+fn filter_users(users: Vec<User>, query: &HashMap<String, String>) -> Vec<User>  {
 
     let mut filtered_rec = Vec::new();    
 
